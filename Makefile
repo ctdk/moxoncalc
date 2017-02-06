@@ -4,7 +4,7 @@ sources = $(wildcard src/*.java)
 classes = $(sources:.java=.class)
 OUTDIR=./lib
 JAVACFLAGS=-d $(OUTDIR)
-MCVERSION=0.2.0
+MCVERSION=`git describe --long --always`
 
 all: dir $(classes)
 
