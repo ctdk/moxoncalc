@@ -26,7 +26,7 @@ Application options:
 BUILDING
 ========
 
-Assuming your Java installation is properly set up, run "make && make jar" in this directory.
+Assuming your Java installation is properly set up, run `make && make jar` in this directory.
 
 INSPIRATION
 ===========
