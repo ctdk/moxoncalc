@@ -26,7 +26,7 @@ Application options:
 OUTPUT
 ======
 
-Should look like this:
+Should look something like this (NB: if the lines and arrows below aren't lining up, it's something weird with Markdown):
 
 ```
 $ java -jar moxoncalc-0.1.0.jar  -f 21.3 -d 10 -u m
