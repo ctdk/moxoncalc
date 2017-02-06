@@ -1,6 +1,7 @@
 package moxoncalc;
 
 import java.lang.*;
+import java.util.*;
 import java.text.DecimalFormat;
 
 /*
@@ -37,7 +38,7 @@ public class MoxonCalc {
 	static final double cFeet = 983.5592;
 	static final double cInches = 11802.71;
 
-	static final String version = "0.1.0";
+	static final String version = "0.2.0";
 
 	private enum DisplayUnit {
 		METER, MM, FEET, INCH, WL
@@ -45,6 +46,10 @@ public class MoxonCalc {
 
 	private enum WireUnit {
 		AWG, INCH, MM, WL
+	}
+
+	private enum OutputFormat {
+		FULL, SHORT, JSON
 	}
 
 	private double dd1;
@@ -57,6 +62,7 @@ public class MoxonCalc {
 		double frequency = 0, wire = 0;
 		String dunits = "";
 		String wunits = "";
+		String formatOut = "";
 		for (int i = 0; i < argLen; i++) {
 			if (args[i].startsWith("-", 0)) {
 				String flag = args[i];
@@ -79,6 +85,9 @@ public class MoxonCalc {
 						break;
 					case "-w":
 						wunits = argument;
+						break;
+					case "-F":
+						formatOut = argument;
 						break;
 					case "-h":
 						System.out.println(helpMessage());
@@ -112,11 +121,56 @@ public class MoxonCalc {
 		// run the calculation
 		m.calcAntenna();
 
-		// ... and display the diagram & numbers
+		OutputFormat fmt = null;
+		try {
+			fmt = setOutputFormat(formatOut);
+		} catch (Exception e) {
+			System.err.println("Caught exception setting output format: " + e.getMessage());
+			System.exit(-5);
+		}
+
 		DecimalFormat df = new DecimalFormat();
-		System.out.printf("Diagram for Moxon antenna for %s MHz, in %s\n.\n", df.format(m.freq), m.displayUnit());
-		System.out.println(m.antennaPicture());
-		System.out.println(m.antennaSidesTable());
+		String wireDisp = m.wireDisplayUnit();
+		
+		switch (fmt) {
+			case FULL:
+				// FULL: display the diagram & numbers
+				System.out.printf("Diagram for Moxon antenna for %s MHz, wire %s %s, in %s.\n\n", df.format(m.freq), df.format(wire), wireDisp, m.displayUnit());
+				System.out.println(m.antennaPicture());
+				System.out.println(m.antennaSidesTable());
+				break;
+			case SHORT:
+				// Display minimal information, without the
+				// diagram of the antenna
+				System.out.printf("%s MHz %s %s %s\n", df.format(m.freq), df.format(wire), wireDisp, m.displayUnit());
+				System.out.println(m.antennaSidesTable());
+				break;
+			case JSON:
+				// Print out a JSON representation of the short
+				// display
+				HashMap<String, String> hm = new HashMap<>();
+				hm.put("freq", df.format(m.freq));
+				hm.put("wire_size", df.format(wire));
+				hm.put("wire_unit", wireDisp);
+				hm.put("size_unit", m.displayUnit());
+				hm.put("A", m.formatWireLength(m.aWire));
+				hm.put("B", m.formatWireLength(m.bWire));
+				hm.put("C", m.formatWireLength(m.cWire));
+				hm.put("D", m.formatWireLength(m.dWire));
+				hm.put("E", m.formatWireLength(m.eWire));
+				System.out.printf("{\n\t\"moxon\": {\n");
+				Set set = hm.entrySet();
+				Iterator it = set.iterator();
+				String [] jsonRows = new String[hm.size()];
+				int cnt = 0;
+				while (it.hasNext()) {
+					Map.Entry me = (Map.Entry)it.next();
+					jsonRows[cnt++] = String.format("\t\t\"%s\": \"%s\"", me.getKey(), me.getValue());
+				}
+				System.out.println(join(jsonRows, ",\n"));
+				System.out.println("\t}\n}");
+				break;
+		}
 	}
 
 	public MoxonCalc (double frequency, double wireDiameter, String dunit, String wunit) throws Exception {
@@ -198,6 +252,25 @@ public class MoxonCalc {
 				u = " wl";
 		}
 		return u;
+	}
+
+	public String wireDisplayUnit() {
+		String wu;
+		switch (wireUnit) {
+			case AWG:
+				wu = "AWG";
+				break;
+			case INCH:
+				wu = "inch";
+				break;
+			case MM:
+				wu = "mm";
+				break;
+			default:
+				wu = "wavelengths";
+				break;
+		}
+		return wu;
 	}
 
 	public String antennaPicture() {
@@ -444,6 +517,25 @@ public class MoxonCalc {
 		return u;
 	}
 
+	private static OutputFormat setOutputFormat(String formatOut) throws Exception {
+		OutputFormat o;
+		switch (formatOut.toLowerCase()) {
+			case "full":
+			case "":
+				o = OutputFormat.FULL;
+				break;
+			case "short":
+				o = OutputFormat.SHORT;
+				break;
+			case "json":
+				o = OutputFormat.JSON;
+				break;
+			default:
+				throw new Exception(String.format("invalid format option %s", formatOut));
+		}
+		return o;
+	}
+
 	private double calcWireSize(double diam, double freq, WireUnit wu) {
 		double ws = 0;
 		
@@ -485,8 +577,9 @@ public class MoxonCalc {
 				+ "Application options:\n"
 				+ "-f:\tFrequency of antenna in megaHertz (Defaults to 14.0 MHz).\n"
 				+ "-d:\tDiameter of wire (specify unit with -w) (Defaults to 14).\n"
-				+ "-u:\tUnits to use to display output. Choices are meter (or m), mm (for millimeters), feet (or f), inch (or i), and wl (for wavelength). Defaults to meter.\n"
-				+ "-w:\tWire size units. Choices are AWG (or a, or awg), mm (for millimeters), inch (or i), and wl (for wavelength). Defaults to AWG.\n"
+				+ "-u:\tUnits to use to display output. Choices are 'meter' (or 'm'), 'mm' (for millimeters), 'feet' (or 'f'), 'inch' (or 'i'), and 'wl' (for wavelength). Defaults to 'meter'.\n"
+				+ "-w:\tWire size units. Choices are 'AWG' (or 'a', or 'awg'), 'mm' (for millimeters), 'inch' (or 'i'), and 'wl' (for wavelength). Defaults to 'AWG'.\n"
+				+ "-F:\tFormat for output. Choices are 'full' (includes diagram and the lengths of the antenna components), 'short' (only the lenghts of the components, along with the frequency and wire size), and 'json' (a JSON representation of 'short'). Defaults to 'full'."
 				+ "\n-v:\tPrint version number.\n"
 				+ "-h:\tPrint this help message.\n";
 		return helpMsg;

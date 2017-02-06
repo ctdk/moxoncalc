@@ -4,7 +4,7 @@ sources = $(wildcard src/*.java)
 classes = $(sources:.java=.class)
 OUTDIR=./lib
 JAVACFLAGS=-d $(OUTDIR)
-MCVERSION=0.1.0
+MCVERSION=0.2.0
 
 all: dir $(classes)
 
@@ -13,6 +13,7 @@ dir:
 
 clean :
 	rm -r $(OUTDIR)
+	$(RM) *.jar
 
 %.class : %.java
 	$(JAVAC) $(JAVACFLAGS) $<

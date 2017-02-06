@@ -1,6 +1,9 @@
-$ java -jar moxoncalc-0.1.0.jar  -f 21.3 -d 10 -u m
-Diagram for Moxon antenna for 21.3 MHz, in meters
-.
+#### FULL OUTPUT
+#### NB: the '-F full' argument is optional for the full display
+
+$ java -jar moxoncalc-0.2.0.jar  -f 21.3 -d 10 -u m -F full
+Diagram for Moxon antenna for 21.3 MHz, wire 10 AWG, in meters.
+
 ←┅ ┅ ┅ ┅ ┅ ┅ ┅ ┅ ┅ ┅ ┅ ┅ ┅ ┅ ┅ ┅ ┅ ┅A┅ ┅ ┅ ┅ ┅ ┅ ┅ ┅ ┅ ┅ ┅ ┅ ┅ ┅ ┅ ┅ →
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ↑  ↑
 ┃                                                                     ┃ ┇  ┇
@@ -18,6 +21,37 @@ Diagram for Moxon antenna for 21.3 MHz, in meters
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ ↓  ↓
 A: 5.1183 m
 B: 0.7661 m
-C: 0.1459 m
+C: 0.2459 m
 D: 0.9578 m
 E: 1.8698 m
+
+####
+
+#### SHORT OUTPUT
+
+$ java -jar moxoncalc-0.2.0.jar  -f 21.3 -d 10 -u m -F short
+21.3 MHz 10 AWG meters
+A: 5.1183 m
+B: 0.7661 m
+C: 0.2459 m
+D: 0.9578 m
+E: 1.8698 m
+
+####
+
+#### JSON OUTPUT
+
+$ java -jar moxoncalc-0.2.0.jar  -f 21.3 -d 10 -u m -F json
+{
+	"moxon": {
+		"wire_size": "10",
+		"A": "5.1183 m",
+		"wire_unit": "AWG",
+		"B": "0.7661 m",
+		"C": "0.2459 m",
+		"D": "0.9578 m",
+		"E": "1.8698 m",
+		"freq": "21.3",
+		"size_unit": "meters"
+	}
+}

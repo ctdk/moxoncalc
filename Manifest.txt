@@ -1,4 +1,4 @@
 Main-Class: moxoncalc.MoxonCalc
 Package-Title: moxoncalc
-Package-Version: 0.1.0
+Package-Version: 0.2.0
 Package-Vendor: Jeremy Bingham
