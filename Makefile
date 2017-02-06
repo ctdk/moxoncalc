@@ -1,13 +1,21 @@
 JAVAC=javac
 JAR=jar
-sources = src/*.java
+sources = $(wildcard src/*.java)
 classes = $(sources:.java=.class)
 OUTDIR=./lib
+JAVACFLAGS=-d $(OUTDIR)
+MCVERSION=0.1.0
 
-all: $(classes)
+all: dir $(classes)
 
-dir: $(OUTDIR)
+dir: 
 	mkdir -p $(OUTDIR)
 
 clean :
-	$(RM) $OUTDIR/*.class
+	rm -r $(OUTDIR)
+
+%.class : %.java
+	$(JAVAC) $(JAVACFLAGS) $<
+
+jar:
+	$(JAR) cfm moxoncalc-$(MCVERSION).jar Manifest.txt -C $(OUTDIR) .

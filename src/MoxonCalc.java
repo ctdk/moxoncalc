@@ -3,6 +3,13 @@ package moxoncalc;
 import java.lang.*;
 import java.text.DecimalFormat;
 
+/*
+ * The online Moxon calculators at http://tippete.net/cgi-bin/moxgen.pl and 
+ * http://ab1jx.1apps.com/ham/calcs/moxon/ provided both inspiration and helped
+ * get me going in the right direction.
+ *
+ */
+
 public class MoxonCalc {
 	public double freq;
 	public double wireSize;
@@ -474,7 +481,7 @@ public class MoxonCalc {
 	
 	private static String helpMessage() {
 		String helpMsg =  "Usage:\n"
-				+ "  java <path> [options]\n\n"
+				+ "  java moxoncalc-<version>.jar [options]\n\n"
 				+ "Application options:\n"
 				+ "-f:\tFrequency of antenna in megaHertz (Defaults to 14.0 MHz).\n"
 				+ "-d:\tDiameter of wire (specify unit with -w) (Defaults to 14).\n"
