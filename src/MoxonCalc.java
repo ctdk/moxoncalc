@@ -315,6 +315,10 @@ public class MoxonCalc {
 		for (int i = 1; i < boxWidth - 1; i++) {
 			topLine[i] = hLine;
 		}
+		// show the feedpoint
+		topLine[aDotHalf] = ' ';
+		topLine[aDotHalf - 1] = 'o';
+		topLine[aDotHalf + 1] = 'o';
 		boxSides[1] = new String(topLine);
 
 
@@ -338,6 +342,17 @@ public class MoxonCalc {
 			for (int i = 1; i < boxWidth - 1; i++) {
 				line[i] = ' ';
 			}
+			// add an arrow and a label for the feedpoint
+			if (j == 2) {
+				line[aDotHalf] = upArrow;
+			} else if (j == 3) {
+				char[] fp = { 'f', 'e', 'e', 'd', 'p', 'o', 'i', 'n', 't' };
+				int q = 0;
+				for (int t = aDotHalf - 4; t < aDotHalf + 5; t++) {
+					line[t] = fp[q++];
+				}
+			}
+
 			boxSides[j] = new String(line);
 		}
 
